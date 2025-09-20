@@ -1,11 +1,17 @@
 import pykube
+from os import getenv
 from mcp.server.fastmcp import FastMCP
+import requests
 
 # Create server
 mcp = FastMCP("Echo Server")
 
-# Configurar el cliente de Kubernetes
-api = pykube.HTTPClient(pykube.KubeConfig.from_env())
+api = None
+# If incluster environment variable configured as INCLUSTER is configured and is true use incluster config
+if getenv("INCLUSTER") == "true":
+    api = pykube.HTTPClient(pykube.KubeConfig.from_service_account())
+else:
+    api = pykube.HTTPClient(pykube.KubeConfig.from_env())
 
 
 @mcp.tool()
@@ -23,6 +29,7 @@ def add(a: int, b: int) -> int:
 def delete_resource(kind: str, name: str, namespace: str = "default") -> str:
     """
     Elimina un recurso específico en Kubernetes.
+    No puedes eliminar recursos del sistema en el namespace kube-system o el servicio kubernetes en el namespace default.
     :param kind: Tipo de recurso (ej. Pod, Service, Deployment, ConfigMap)
     :param name: Nombre del recurso
     :param namespace: Namespace donde se encuentra el recurso
@@ -43,6 +50,38 @@ def delete_resource(kind: str, name: str, namespace: str = "default") -> str:
     except Exception as e:
         return f"❌ Error al eliminar recurso: {e}"
 
+
+@mcp.tool()
+def turn_on_reactor():
+    """
+    Enciende el reactor.
+    """
+    try:
+        response = requests.post("https://reactor.adawolfs.com/encender")
+        if response.status_code == 200:
+            return "✅ Reactor encendido exitosamente."
+        else:
+            return f"❌ Error al encender el reactor: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"❌ Error al realizar la solicitud: {e}"
+
+
+@mcp.tool()
+def turn_on_off():
+    """
+    Apaga el reactor.
+    """
+    try:
+        response = requests.post("https://reactor.adawolfs.com/apagar")
+        if response.status_code == 200:
+            return "✅ Reactor apagado exitosamente."
+        else:
+            return f"❌ Error al encender el reactor: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"❌ Error al realizar la solicitud: {e}"
+
+
+
 # Tool para crear recursos en Kubernetes
 @mcp.tool()
 def create_resource(kind: str, name: str, namespace: str = "default", spec: dict = None) -> str:
@@ -54,6 +93,7 @@ def create_resource(kind: str, name: str, namespace: str = "default", spec: dict
     :param spec: Especificación simple con unicamente lo necesario del recurso en formato dict
     :return: Mensaje de éxito o error
     """
+    print("create")
     try:
         # Obtener la clase correspondiente al tipo de recurso
         resource_class = getattr(pykube, kind, None)

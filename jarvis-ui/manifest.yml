@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis-ui
+  namespace: jarvis-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jarvis-ui
+  template:
+    metadata:
+      labels:
+        app: jarvis-ui
+    spec:
+      containers:
+        - name: jarvis-ui
+          image: ghcr.io/adawolfs/jarvis-ui:latest
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: INCLUSTER
+              value: "true"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jarvis-ui-secret
+                  key: OPENAI_API_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jarvis-ui
+  namespace: jarvis-mcp
+spec:
+  selector:
+    app: jarvis-ui
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jarvis-ui-ingress
+  namespace: jarvis-mcp
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jarvis-ui.adawolfs.com
+      secretName: adawolfs-origin-tls
+  rules:
+    - host: jarvis-ui.adawolfs.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jarvis-ui
+                port:
+                  number: 80

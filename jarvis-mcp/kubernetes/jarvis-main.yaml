@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jarvis-mcp
+  template:
+    metadata:
+      labels:
+        app: jarvis-mcp
+    spec:
+      containers:
+        - name: jarvis-mcp
+          image: ghcr.io/adawolfs/jarvis-mcp:latest
+          command: ["uv", "run", "main.py"]
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: INCLUSTER
+              value: "true"
+            - name: MCP_SSE_SERVER_URL
+              value: "http://jarvis-mcp-server/sse"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-api-key
+                  key: OPENAI_API_KEY
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jarvis-mcp
+spec:
+  selector:
+    app: jarvis-mcp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
