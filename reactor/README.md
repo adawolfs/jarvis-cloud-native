@@ -20,7 +20,7 @@ Jarvis Reactor is an Arduino-based project designed for the ESP32 microcontrolle
 ### Software Requirements
 
 - Arduino IDE (latest version)
-- `jarvis.ino` file (main firmware)
+- `reactor.ino` file (main firmware)
 
 ### Installation
 
