@@ -1,7 +1,0 @@
-
-POST https://jarvis.adawolfs.com/ask
-content-type: application/json
-
-{
-	"question": "hola como estas"
-}
