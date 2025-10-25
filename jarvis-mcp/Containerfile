@@ -1,9 +1,14 @@
 FROM ghcr.io/astral-sh/uv:debian-slim
 
-COPY . /app
 WORKDIR /app
 
-# Install dependencies
+# Copy dependency manifests first so layer is cached unless they change
+COPY pyproject.toml uv.lock /app/
+
+# Install dependencies (cached unless pyproject.toml or uv.lock change)
 RUN uv sync
+
+# Copy the rest of the application after installing deps
+COPY . /app
 
 EXPOSE 8000

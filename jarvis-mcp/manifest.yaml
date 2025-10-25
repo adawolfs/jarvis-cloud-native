@@ -58,37 +58,64 @@ metadata:
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: jarvis-mcp-server-clusterrole
+  name: jarvis-mcp-server-role
+  namespace: default
 rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
     verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["create", "get", "list", "watch", "update", "patch", "delete" ]
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
   - apiGroups: [""]
     resources: ["pods", "configmaps"]
     verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
   - apiGroups: [""]
     resources: ["services"]
     verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: jarvis-mcp-server-clusterrolebinding
+  name: jarvis-mcp-server-rolebinding
+  namespace: default
 subjects:
   - kind: ServiceAccount
     name: jarvis-mcp-server-sa
     namespace: jarvis-mcp
 roleRef:
-  kind: ClusterRole
-  name: jarvis-mcp-server-clusterrole
   apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jarvis-mcp-server-role
 
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: block-delete-kubernetes-svc
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["DELETE"]
+        resources: ["services"]
+        scope: "Namespaced"
+  validations:
+    # En operaciones DELETE, 'oldObject' es el recurso actual.
+    - expression: "!(oldObject.metadata.name == 'kubernetes' && oldObject.metadata.namespace == 'default')"
+      message: "Eliminar el Service 'kubernetes' en 'default' está prohibido por política."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: block-delete-kubernetes-svc-binding
+spec:
+  policyName: block-delete-kubernetes-svc
+  validationActions: ["Deny"]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
