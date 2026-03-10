@@ -1,41 +1,29 @@
-'use server';
+"use server";
 
 export async function getToken() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error('Missing OPENAI_API_KEY environment variable.');
+    throw new Error("Missing OPENAI_API_KEY environment variable.");
   }
 
   const response = await fetch(
-    'https://api.openai.com/v1/realtime/client_secrets',
+    "https://api.openai.com/v1/realtime/client_secrets",
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         session: {
-          type: 'realtime',
-          model: 'gpt-realtime',
+          type: "realtime",
+          model: "gpt-realtime",
           tools: [
             {
-              type: 'mcp',
-              server_label: 'k8s',
-              server_url: 'https://jarvis-mcp.adawolfs.com/sse',
-              require_approval: 'never',
-            },
-            {
-              type: 'mcp',
-              server_label: 'weather',
-              server_url: 'https://weather-mcp.deno.dev/sse',
-              require_approval: 'always',
-            },
-            {
-              type: 'mcp',
-              server_label: 'dnd',
-              server_url: 'https://dmcp-server.deno.dev/sse',
-              require_approval: 'always',
+              type: "mcp",
+              server_label: "k8s",
+              server_url: "https://jarvis-mcp.adawolfs.com/sse",
+              require_approval: "never",
             },
           ],
           // tracing: {
@@ -47,7 +35,7 @@ export async function getToken() {
   );
 
   if (!response.ok) {
-    let detail = '';
+    let detail = "";
     try {
       const errJson = await response.json();
       detail = JSON.stringify(errJson);
@@ -55,7 +43,7 @@ export async function getToken() {
       detail = await response.text();
     }
     throw new Error(
-      `Failed to create ephemeral client secret: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ''}`,
+      `Failed to create ephemeral client secret: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
     );
   }
 

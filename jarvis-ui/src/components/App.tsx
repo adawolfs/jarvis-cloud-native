@@ -2,7 +2,6 @@
 import {
   RealtimeItem,
   OutputGuardrailTripwireTriggered,
-  TransportEvent,
 } from "@openai/agents/realtime";
 import { History } from "@/components/History";
 import { Button } from "@/components/ui/Button";
@@ -15,8 +14,6 @@ export type AppProps = {
   toggleMute: () => void;
   history?: RealtimeItem[];
   outputGuardrailResult?: OutputGuardrailTripwireTriggered<any> | null;
-  events: TransportEvent[];
-  mcpTools?: string[];
 };
 
 export function App({
@@ -27,13 +24,31 @@ export function App({
   history,
   outputGuardrailResult,
 }: AppProps) {
-  // Avoid hydration mismatches when layout changes between server and client
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [isHeaderElevated, setIsHeaderElevated] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeaderElevated(window.scrollY > 8);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="flex min-h-dvh justify-center px-3 sm:px-6">
       <div className="flex w-full max-w-6xl flex-1 flex-col gap-4 py-4 md:py-6">
-        <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <header
+          className={`sticky top-0 z-10 flex flex-col gap-2 pb-2 pt-2 transition-colors duration-200 sm:flex-row sm:items-center sm:justify-between ${
+            isHeaderElevated
+              ? "bg-background/90 shadow-sm backdrop-blur"
+              : "bg-transparent"
+          }`}
+        >
           <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
           <div className="flex flex-wrap gap-2">
             {isConnected && (

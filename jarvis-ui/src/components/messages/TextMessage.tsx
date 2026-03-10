@@ -1,20 +1,4 @@
 import clsx from "clsx";
-import React from "react";
-
-type CustomLinkProps = {
-  href?: string;
-  children?: React.ReactNode;
-};
-
-const CustomLink = ({ href, children, ...props }: CustomLinkProps) => (
-  <a
-    href={href}
-    {...props}
-    className="bg-gray-200 rounded-full py-1 px-2 text-sm font-medium hover:text-white hover:bg-black"
-  >
-    {children}
-  </a>
-);
 
 type TextMessageProps = {
   text: string;

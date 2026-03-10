@@ -1,14 +1,14 @@
 "use client";
+import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/Button";
 
 export type SplashProps = {
   connect: () => void;
-  isConnected: boolean;
   children?: React.ReactNode;
 };
 
-export function Splash({ isConnected, connect, children }: SplashProps) {
+export function Splash({ connect, children }: SplashProps) {
   const [showSplash, setShowSplash] = useState(true);
   const [started, setStarted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -32,13 +32,15 @@ export function Splash({ isConnected, connect, children }: SplashProps) {
   };
 
   useEffect(() => {
+    const audio = audioRef.current;
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      const timer = timerRef.current;
+      if (timer) {
+        clearTimeout(timer);
       }
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
       }
     };
   }, []);
@@ -62,21 +64,22 @@ export function Splash({ isConnected, connect, children }: SplashProps) {
       >
         <audio ref={audioRef} src="/jarvis-intro.mp3" autoPlay preload="auto" />
         {!started ? (
-          <Button
-              onClick={handleStart}
-              variant='outline'
-            >
-              Start J.A.R.V.I.S
+          <Button onClick={handleStart} variant="outline">
+            Start J.A.R.V.I.S
           </Button>
         ) : (
-          <img
+          <Image
             src="/jarvis.gif"
             alt="Loading..."
+            width={800}
+            height={600}
+            unoptimized
             style={{
               display: "block",
               maxWidth: "100vw",
               maxHeight: "100vh",
               border: "none",
+              height: "auto",
             }}
           />
         )}
