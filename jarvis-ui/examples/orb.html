@@ -1,0 +1,191 @@
+<canvas id="canvas"></canvas>
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #020204;
+}
+
+canvas {
+  width: 400px;
+  height: 400px;
+}
+
+
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// Constants
+const dpr = window.devicePixelRatio || 1;
+const pi = Math.PI;
+const points = 12;
+const baseOrbRadius = 135;
+const canvasSize = 400;
+
+// State
+let currentOrbRadius = baseOrbRadius;
+let tick = 0;
+
+// Canvas dimensions
+canvas.width = canvasSize * dpr;
+canvas.height = canvasSize * dpr;
+canvas.style.width = canvasSize + "px";
+canvas.style.height = canvasSize + "px";
+ctx.scale(dpr, dpr);
+
+// Center point
+const center = { x: canvasSize / 2, y: canvasSize / 2 };
+
+// Swing circles setup
+const circles = [];
+for (let idx = 0; idx < 4; idx++) {
+  const swingpoints = [];
+  for (let i = 0; i < points; i++) {
+    const radian = ((pi * 2) / points) * i;
+    swingpoints.push({
+      x: center.x + baseOrbRadius * Math.cos(radian),
+      y: center.y + baseOrbRadius * Math.sin(radian),
+      radian: radian,
+      range: random(5, 15),
+      phase: random(0, pi * 2)
+    });
+  }
+  circles.push(swingpoints);
+}
+
+function createGradient(angle, colorStops, x, y, radius) {
+  const angleRad = ((angle - 90) * Math.PI) / 180;
+  const startX = x - Math.cos(angleRad) * radius;
+  const startY = y - Math.sin(angleRad) * radius;
+  const endX = x + Math.cos(angleRad) * radius;
+  const endY = y + Math.sin(angleRad) * radius;
+
+  const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+  colorStops.forEach((stop) => {
+    gradient.addColorStop(stop.position / 100, stop.color);
+  });
+  return gradient;
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+  // Breathing rhythm
+  const breath = Math.sin(tick * 0.02);
+  const pulseScale = 1 + breath * 0.05;
+  currentOrbRadius = baseOrbRadius * pulseScale;
+
+  // Draw swirling layers
+  circles.forEach((swingpoints, k) => {
+    swingpoints.forEach((point, i) => {
+      point.phase += random(1, 10) * -0.005;
+      let phase = 2 * Math.sin(tick / 65);
+
+      const baseRadius = currentOrbRadius + 3;
+      const displacement = point.range * phase * Math.sin(point.phase);
+      const r = Math.max(
+        currentOrbRadius * 0.85,
+        Math.min(baseRadius + displacement * 0.8, currentOrbRadius * 1.4)
+      );
+
+      point.radian += pi / 360;
+      point.x = center.x + r * Math.cos(point.radian);
+      point.y = center.y + r * Math.sin(point.radian);
+    });
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.filter = `blur(4px)`;
+
+    const opacity = 0.6;
+    const gradientRadius = currentOrbRadius * 1.2;
+
+    const gradient = createGradient(
+      tick / 2 + k * 60,
+      [
+        { position: 0, color: `rgba(0, 20, 100, 0)` },
+        { position: 20, color: `rgba(61, 90, 255, ${opacity})` },
+        { position: 50, color: `rgba(157, 0, 255, ${opacity})` },
+        { position: 80, color: `rgba(255, 95, 31, ${opacity})` },
+        { position: 100, color: `rgba(255, 200, 0, ${opacity})` }
+      ],
+      center.x,
+      center.y,
+      gradientRadius
+    );
+
+    drawCurve(swingpoints, gradient);
+  });
+
+  // --- MASKING LOGIC ---
+  // This physically erases the center pixels to ensure transparency
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.filter = "none"; // Ensure mask is sharp (or soft if we use gradient)
+
+  const holeRadius = currentOrbRadius * 0.99; // Size of the transparent hole
+
+  // Create a radial gradient for a soft fade-out at the inner edge
+  const maskGradient = ctx.createRadialGradient(
+    center.x,
+    center.y,
+    0,
+    center.x,
+    center.y,
+    holeRadius
+  );
+  maskGradient.addColorStop(0, "rgba(0, 0, 0, 1)"); // Fully transparent center
+  maskGradient.addColorStop(0.9, "rgba(0, 0, 0, 1)"); // Keep clearing until 70% of radius
+  maskGradient.addColorStop(1, "rgba(0, 0, 0, 0)"); // Fade edge
+
+  ctx.fillStyle = maskGradient;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, holeRadius, 0, pi * 2);
+  ctx.fill();
+
+  // Reset composite for next frame
+  ctx.globalCompositeOperation = "source-over";
+
+  tick++;
+  requestAnimationFrame(animate);
+}
+
+function drawCurve(pts, fillStyle) {
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.moveTo(
+    (pts[pts.length - 1].x + pts[0].x) / 2,
+    (pts[pts.length - 1].y + pts[0].y) / 2
+  );
+
+  for (let i = 0; i < pts.length; i++) {
+    const nextIndex = (i + 1) % pts.length;
+    ctx.quadraticCurveTo(
+      pts[i].x,
+      pts[i].y,
+      (pts[i].x + pts[nextIndex].x) / 2,
+      (pts[i].y + pts[nextIndex].y) / 2
+    );
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+animate();

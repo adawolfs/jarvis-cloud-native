@@ -5,15 +5,16 @@ import * as React from "react";
 import { cn } from "@/components/ui/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         ghost:
-          "text-gray-800 disabled:text-gray-300 hover:bg-gray-100 hover:text-black",
-        primary: "bg-black text-white hover:bg-gray-800 disabled:bg-gray-300",
+          "text-cyan-100 disabled:text-cyan-100/40 hover:bg-cyan-400/10 hover:text-cyan-50",
+        primary:
+          "bg-cyan-300 text-slate-950 hover:bg-cyan-200 disabled:bg-cyan-200/40",
         outline:
-          "border border-2 border-gray-100 text-gray-800 dark:text-white hover:bg-gray-100 hover:text-black",
+          "border border-cyan-300/50 text-cyan-100 hover:bg-cyan-400/15 hover:text-cyan-50",
         stop: "bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300",
       },
       size: {
@@ -29,11 +30,12 @@ const buttonVariants = cva(
       variant: "ghost",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
@@ -48,7 +50,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = "Button";
 

@@ -7,9 +7,20 @@ export type HistoryProps = {
 };
 
 export function History({ history }: HistoryProps) {
+  if (history.length === 0) {
+    return (
+      <div
+        className="flex h-full min-h-0 w-full items-center justify-center rounded-lg border border-cyan-400/20 bg-[#031122]/60 p-4 text-center text-cyan-100/70"
+        id="chatHistory"
+      >
+        No debug history available
+      </div>
+    );
+  }
+
   return (
     <div
-      className="h-full min-h-0 w-full overflow-y-auto rounded-lg bg-white p-3 sm:p-4 space-y-4"
+      className="h-full min-h-0 w-full space-y-4 overflow-y-auto rounded-lg border border-cyan-400/20 bg-[#031122]/60 p-3 sm:p-4"
       id="chatHistory"
     >
       {history.map((item) => {

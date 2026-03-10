@@ -8,6 +8,8 @@ export default function Home() {
   const {
     isConnected,
     isMuted,
+    voiceMode,
+    voiceEnergy,
     history,
     outputGuardrailResult,
     connect,
@@ -20,6 +22,8 @@ export default function Home() {
         <App
           isConnected={isConnected}
           isMuted={isMuted}
+          voiceMode={voiceMode}
+          voiceEnergy={voiceEnergy}
           toggleMute={toggleMute}
           history={history}
           outputGuardrailResult={outputGuardrailResult}

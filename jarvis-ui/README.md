@@ -1,6 +1,7 @@
 # Jarvis UI
 
 Interfaz web para el agente JARVIS con OpenAI Agents SDK y MCP k8s.
+La UI principal usa un nucleo sci-fi de particulas y modo debug para historial textual.
 
 ## Requisitos
 
@@ -36,7 +37,7 @@ La configuracion del token se encuentra en `src/app/server/token.action.tsx`.
 - `npm run lint`: lint
 - `npm run build-check`: typecheck
 - `npm test`: unit tests (Vitest)
-- `npx playwright test`: e2e (Playwright)
+- `npm run test:e2e`: e2e (Playwright)
 
 ## Arquitectura
 

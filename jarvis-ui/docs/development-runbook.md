@@ -12,9 +12,15 @@ Define `OPENAI_API_KEY` en tu entorno.
 ## Tests
 
 - Unit tests: `npm test`
-- E2E: `npx playwright test`
+- E2E: `npm run test:e2e`
 - Typecheck: `npm run build-check`
 - Lint: `npm run lint`
+
+Si Playwright falla por navegadores no instalados:
+
+```bash
+npx playwright install
+```
 
 ## Agregar o cambiar MCP
 
@@ -27,3 +33,4 @@ Define `OPENAI_API_KEY` en tu entorno.
 - Error de token: verifica `OPENAI_API_KEY`.
 - Audio no funciona: revisa permisos del navegador.
 - MCP sin respuesta: valida la URL del server y su disponibilidad.
+- Modo debug: usa el boton `Debug On/Off` para mostrar u ocultar historial textual.
