@@ -1,12 +1,12 @@
-'use client';
+"use client";
 import {
   RealtimeItem,
   OutputGuardrailTripwireTriggered,
   TransportEvent,
-} from '@openai/agents/realtime';
-import { History } from '@/components/History';
-import { Button } from '@/components/ui/Button';
-import { useEffect, useState } from 'react';
+} from "@openai/agents/realtime";
+import { History } from "@/components/History";
+import { Button } from "@/components/ui/Button";
+import { useEffect, useState } from "react";
 
 export type AppProps = {
   title?: string;
@@ -20,7 +20,7 @@ export type AppProps = {
 };
 
 export function App({
-  title = 'J.A.R.V.I.S',
+  title = "J.A.R.V.I.S",
   isConnected,
   isMuted,
   toggleMute,
@@ -31,35 +31,35 @@ export function App({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
-    <div className="flex justify-center">
-      <div className="p-4 md:max-h-screen overflow-hidden h-screen flex flex-col max-w-6xl w-full">
-        <header className="flex-none flex justify-between items-center pb-4 w-full max-w-6xl">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <div className="flex gap-2" >
+    <div className="flex min-h-dvh justify-center px-3 sm:px-6">
+      <div className="flex w-full max-w-6xl flex-1 flex-col gap-4 py-4 md:py-6">
+        <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
+          <div className="flex flex-wrap gap-2">
             {isConnected && (
               <Button
                 onClick={toggleMute}
-                variant={isMuted ? 'primary' : 'outline'}
+                variant={isMuted ? "primary" : "outline"}
               >
-                {isMuted ? 'Unmute' : 'Mute'}
+                {isMuted ? "Unmute" : "Mute"}
               </Button>
             )}
           </div>
         </header>
-        <div className="flex gap-10 flex-col md:flex-row h-full max-h-full overflow-y-hidden">
-          <div className="flex-2/3 flex-grow overflow-y-scroll pb-24">
+        <div className="flex flex-1 min-h-0 flex-col gap-6 md:flex-row">
+          <div className="flex min-h-0 flex-1 overflow-hidden">
             {history ? (
               <History history={history} />
             ) : (
-              <div className="h-full flex items-center justify-center text-center text-gray-500">
+              <div className="flex h-full w-full items-center justify-center text-center text-gray-500">
                 No history available
               </div>
             )}
           </div>
-          <div className="flex-1/3 flex flex-col flex-grow gap-4">
+          <div className="flex w-full flex-none flex-col gap-4 md:w-72 lg:w-80">
             {outputGuardrailResult && (
-              <div className="flex-0 w-full p-2 border border-blue-300 rounded-md bg-blue-50 text-blue-900 text-xs self-end shadow-sm">
-                <span className="font-semibold">Guardrail:</span>{' '}
+              <div className="w-full rounded-md border border-blue-300 bg-blue-50 p-3 text-xs text-blue-900 shadow-xs">
+                <span className="font-semibold">Guardrail:</span>{" "}
                 {outputGuardrailResult?.message ||
                   JSON.stringify(outputGuardrailResult)}
               </div>

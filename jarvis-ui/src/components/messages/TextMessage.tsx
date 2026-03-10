@@ -1,5 +1,5 @@
-import clsx from 'clsx';
-import React from 'react';
+import clsx from "clsx";
+import React from "react";
 
 type CustomLinkProps = {
   href?: string;
@@ -24,17 +24,19 @@ type TextMessageProps = {
 export function TextMessage({ text, isUser }: TextMessageProps) {
   return (
     <div
-      className={clsx('flex flex-row gap-2', {
-        'justify-end py-2': isUser,
+      className={clsx("flex flex-row gap-2", {
+        "justify-end py-2": isUser,
       })}
     >
       <div
-        className={clsx('rounded-[16px]', {
-          'px-4 py-2 max-w-[90%] ml-4 dark:text-gray-500 bg-[#ededed]': isUser,
-          'px-4 py-2 max-w-[90%] mr-4 dark:text-gray-500 bg-white': !isUser,
+        className={clsx("rounded-[16px]", {
+          "px-4 py-2 max-w-[90%] ml-4 dark:text-gray-500 bg-[#ededed]": isUser,
+          "px-4 py-2 max-w-[90%] mr-4 dark:text-gray-500 bg-white": !isUser,
         })}
       >
-        {text}
+        <span className="whitespace-pre-wrap break-words text-sm sm:text-base">
+          {text}
+        </span>
       </div>
     </div>
   );
